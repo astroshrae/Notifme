@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifme</title>
+
+  <style>
+    /* General Body and Layout */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #eef2f7;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 700px;
+      width: 100%;
+      margin: 30px auto;
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e0e0e0;
+      box-sizing: border-box;
+    }
+
+    /* Heading */
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2em;
+      font-weight: 700;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 15px;
+    }
+
+    /* Label */
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+      font-size: 0.95em;
+      line-height: 1.4;
+    }
+
+    /* Inputs & Textarea */
+    input[type="text"],
+    input[type="url"],
+    textarea {
+      width: calc(100% - 24px);
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 16px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+      max-height: 300px;
+    }
+
+    /* Button */
+    button {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.1s ease;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    button:hover { background-color: #0056b3; transform: translateY(-2px); }
+    button:active { transform: translateY(0); }
+    button:disabled { background-color: #a0c9ed; cursor: not-allowed; transform: none; }
+
+    /* Status Message */
+    .status-message {
+      margin-top: 25px;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.95em;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+
+    .status-message.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .status-message.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .status-message.info { background-color: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
+
+    /* Notification Preview */
+    .notification-preview-section {
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 1px solid #e0e0e0;
+      text-align: center;
+    }
+
+    .notification-preview-section h2 {
+      color: #2c3e50;
+      font-size: 1.6em;
+      margin-bottom: 25px;
+    }
+
+    .notification-preview {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 0 auto 20px auto;
+      max-width: 400px;
+      text-align: left;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    .notification-preview-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .preview-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #eee;
+      flex-shrink: 0;
+      overflow: hidden;
+      display: none;
+    }
+
+    .preview-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .preview-text-content {
+      flex-grow: 1;
+    }
+
+    .preview-title {
+      font-weight: 700;
+      font-size: 1.1em;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .preview-body {
+      font-size: 0.9em;
+      color: #555;
+      line-height: 1.4;
+      max-height: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    .preview-large-image {
+      width: 100%;
+      max-height: 200px;
+      background-color: #e0e0e0;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .preview-large-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .preview-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: #bbb;
+      overflow: hidden;
+      display: none;
+      z-index: 10;
+    }
+
+    .preview-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+  </style>
+
+  <!-- OneSignal SDK -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "cee819a2-2372-4c54-915a-d3268fcd94c8",
+        safari_web_id: "web.onesignal.auto.6b1e0125-c07a-4d4d-8123-db80df1063df",
+        notifyButton: { enable: true },
+      });
+      console.log("OneSignal SDK initialized.");
+    });
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Notifme</h1>
+
+    <label for="titleInput">Notification Title:</label>
+    <input type="text" id="titleInput" placeholder="Enter notification title" required>
+
+    <label for="messageInput">Notification Message:</label>
+    <textarea id="messageInput" placeholder="Enter the main message body" required></textarea>
+
+    <label for="iconUrlInput">Icon Image URL:</label>
+    <input type="url" id="iconUrlInput" placeholder="https://example.com/icon.png">
+
+    <label for="imageUrlInput">Large Image URL:</label>
+    <input type="url" id="imageUrlInput" placeholder="https://example.com/image.png">
+
+    <label for="badgeUrlInput">Badge Image URL:</label>
+    <input type="url" id="badgeUrlInput" placeholder="https://example.com/badge.png">
+
+    <label for="targetUrlInput">Target URL:</label>
+    <input type="url" id="targetUrlInput" placeholder="https://yourwebsite.com">
+
+    <button id="sendButton">Send Notification</button>
+    <div id="statusMessage" class="status-message"></div>
+
+    <div class="notification-preview-section">
+      <h2>Notification Preview</h2>
+      <div class="notification-preview">
+          <div class="notification-preview-header">
+              <div class="preview-icon"><img id="previewIconImg" src="" alt="Icon"></div>
+              <div class="preview-text-content">
+                  <div class="preview-title" id="previewTitle">Notification Title</div>
+                  <div class="preview-body" id="previewBody">Notification body text goes here.</div>
+              </div>
+          </div>
+          <div class="preview-large-image" id="previewLargeImageContainer">
+              <img id="previewLargeImage" src="" alt="Large Image">
+          </div>
+          <div class="preview-badge" id="previewBadgeContainer">
+              <img id="previewBadgeImg" src="" alt="Badge">
+          </div>
+      </div>
+      <p style="font-size: 0.8em; color: #888;">
+          * This preview is an approximation. Actual appearance may vary by browser and OS.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // --- OneSignal App ID ---
+    const ONESIGNAL_APP_ID = "cee819a2-2372-4c54-915a-d3268fcd94c8";
+
+    // --- DOM References ---
+    const titleInput = document.getElementById("titleInput");
+    const messageInput = document.getElementById("messageInput");
+    const iconUrlInput = document.getElementById('iconUrlInput');
+    const imageUrlInput = document.getElementById('imageUrlInput');
+    const badgeUrlInput = document.getElementById('badgeUrlInput');
+    const targetUrlInput = document.getElementById("targetUrlInput");
+    const sendButton = document.getElementById("sendButton");
+    const statusMessageDiv = document.getElementById("statusMessage");
+
+    // Preview elements
+    const previewTitle = document.getElementById('previewTitle');
+    const previewBody = document.getElementById('previewBody');
+    const previewIconImg = document.getElementById('previewIconImg');
+    const previewIconContainer = previewIconImg.parentElement;
+    const previewLargeImageContainer = document.getElementById('previewLargeImageContainer');
+    const previewLargeImage = document.getElementById('previewLargeImage');
+    const previewBadgeContainer = document.getElementById('previewBadgeContainer');
+    const previewBadgeImg = document.getElementById('previewBadgeImg');
+
+    // --- Event Listeners ---
+    sendButton.addEventListener("click", sendNotification);
+
+    titleInput.addEventListener('input', updatePreview);
+    messageInput.addEventListener('input', updatePreview);
+    iconUrlInput.addEventListener('input', updatePreview);
+    imageUrlInput.addEventListener('input', updatePreview);
+    badgeUrlInput.addEventListener('input', updatePreview);
+    targetUrlInput.addEventListener('input', updatePreview);
+
+    document.addEventListener('DOMContentLoaded', updatePreview);
+
+    function updatePreview() {
+        previewTitle.textContent = titleInput.value.trim() || 'Notification Title';
+        previewBody.textContent = messageInput.value.trim() || 'Notification body text goes here.';
+
+        if (iconUrlInput.value.trim()) {
+            previewIconImg.src = iconUrlInput.value.trim();
+            previewIconContainer.style.display = 'block';
+        } else { previewIconImg.src = ''; previewIconContainer.style.display = 'none'; }
+
+        if (imageUrlInput.value.trim()) {
+            previewLargeImage.src = imageUrlInput.value.trim();
+            previewLargeImageContainer.style.display = 'block';
+        } else { previewLargeImage.src = ''; previewLargeImageContainer.style.display = 'none'; }
+
+        if (badgeUrlInput.value.trim()) {
+            previewBadgeImg.src = badgeUrlInput.value.trim();
+            previewBadgeContainer.style.display = 'block';
+        } else { previewBadgeImg.src = ''; previewBadgeContainer.style.display = 'none'; }
+    }
+
+    async function sendNotification() {
+        const title = titleInput.value.trim();
+        const message = messageInput.value.trim();
+        const iconUrl = iconUrlInput.value.trim();
+        const imageUrl = imageUrlInput.value.trim();
+        const badgeUrl = badgeUrlInput.value.trim();
+        const targetUrl = targetUrlInput.value.trim();
+
+        if (!title || !message) {
+          displayStatus("Please fill in both title and message.", "error");
+          return;
+        }
+
+        displayStatus("Sending notification...", "info");
+        sendButton.disabled = true;
+
+        try {
+            // Send notification via OneSignal REST API
+            const response = await fetch("/api/sendNotification", { // Node.js function on Vercel
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, message, iconUrl, imageUrl, badgeUrl, targetUrl })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                displayStatus(`Notification sent successfully! ✅`, "success");
+                titleInput.value = messageInput.value = iconUrlInput.value = imageUrlInput.value = badgeUrlInput.value = targetUrlInput.value = "";
+                updatePreview();
+            } else {
+                displayStatus(`Error: ${data.error || "Unknown error"}`, "error");
+            }
+        } catch (err) {
+            console.error(err);
+            displayStatus("Network error: Could not send notification.", "error");
+        } finally {
+            sendButton.disabled = false;
+        }
+    }
+
+    function displayStatus(msg, type) {
+        statusMessageDiv.textContent = msg;
+        statusMessageDiv.className = "status-message " + type;
+    }
+  </script>
+</body>
+</html>
